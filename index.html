@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Selection Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
+    <style>
+       
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-button" onclick="history.back()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            <h2 class="title">Crop Selection Assistant</h2>
+        </div>
+
+        <form id="cropForm">
+            <div class="form-group">
+                <label class="form-label">State</label>
+                <select class="form-control" name="state" required>
+                    <option value="">Select state</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">District</label>
+                <select class="form-control" name="district" required disabled>
+                    <option value="">Select district</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Village</label>
+                <input type="text" class="form-control" name="village" required pattern="[A-Za-z\s]+" title="Please enter a valid village name (letters and spaces only)">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Season</label>
+                <select class="form-control" name="season" required>
+                    <option value="">Select season</option>
+                    <option value="kharif">Kharif (June-October)</option>
+                    <option value="rabi">Rabi (October-March)</option>
+                    <option value="zaid">Zaid (March-June)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Water Availability</label>
+                <select class="form-control" name="waterAvailability" required>
+                    <option value="">Select water source</option>
+                    <option value="well">Well</option>
+                    <option value="canal">Canal</option>
+                    <option value="rain">Rain Dependent</option>
+                    <option value="bore">Bore Well</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Soil Type</label>
+                <select class="form-control" name="soilType" required>
+                    <option value="">Select soil type</option>
+                    <option value="black">Black Soil (Kali Mitti)</option>
+                    <option value="red">Red Soil (Lal Mitti)</option>
+                    <option value="sandy">Sandy Soil (Retili Mitti)</option>
+                    <option value="loamy">Loamy Soil (Domat Mitti)</option>
+                    <option value="clay">Clay Soil (Chikni Mitti)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Average Rainfall (mm/year)</label>
+                <select class="form-control" name="rainfall" required>
+                    <option value="">Select rainfall range</option>
+                    <option value="low">Low (0-750 mm)</option>
+                    <option value="medium">Medium (750-1500 mm)</option>
+                    <option value="high">High (Above 1500 mm)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Average Temperature (°C)</label>
+                <select class="form-control" name="temperature" required>
+                    <option value="">Select temperature range</option>
+                    <option value="cool">Cool (Below 20°C)</option>
+                    <option value="moderate">Moderate (20-30°C)</option>
+                    <option value="warm">Warm (Above 30°C)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Previous Crop</label>
+                <input type="text" class="form-control" name="previousCrop" required placeholder="e.g., Wheat, Rice, Cotton">
+            </div>
+
+            <button type="submit" class="submit-button">Get Recommendations</button>
+        </form>
+
+        <div id="recommendations" style="display: none"></div>
+        <div id="error" style="display: none"></div>
+
+        <p class="disclaimer">
+            Disclaimer: These recommendations are suggestions only. Consult experts before planting crops.
+        </p>
+    </div>
+
+    <script src="script.js" >
+      
+    </script>
+</body>
+</html>
