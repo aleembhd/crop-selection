@@ -78,7 +78,7 @@ form.addEventListener('submit', async (e) => {
             }
         }
 
-        Recommend TOP 4 SUITABLE crops. Return JSON:
+        Return ONLY a valid JSON response in exactly this format, with no additional text or markdown:
         {
             "recommendations": [
                 {
@@ -113,15 +113,33 @@ form.addEventListener('submit', async (e) => {
         // Safe parsing of the AI response
         let aiResponse;
         try {
-            // First try to get the response text
             const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
             if (!responseText) {
                 throw new Error('Invalid API response format');
             }
-            // Then parse it as JSON
-            aiResponse = JSON.parse(responseText);
+            
+            // Clean the response text before parsing
+            const cleanedResponse = responseText
+                .replace(/```json/g, '')  // Remove JSON code block markers
+                .replace(/```/g, '')      // Remove any remaining code block markers
+                .replace(/\n/g, '')       // Remove newlines
+                .trim();                  // Remove extra whitespace
+            
+            // Try to find valid JSON in the response
+            const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                aiResponse = JSON.parse(jsonMatch[0]);
+            } else {
+                throw new Error('No valid JSON found in response');
+            }
+            
+            // Validate the response structure
+            if (!aiResponse.recommendations || !Array.isArray(aiResponse.recommendations)) {
+                throw new Error('Invalid recommendations format');
+            }
         } catch (parseError) {
             console.error('Failed to parse AI response:', parseError);
+            console.log('Raw response:', data.candidates?.[0]?.content?.parts?.[0]?.text);
             throw new Error('Failed to parse AI recommendations');
         }
         
