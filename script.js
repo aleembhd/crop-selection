@@ -78,16 +78,24 @@ form.addEventListener('submit', async (e) => {
             }
         }
 
-        Return ONLY a valid JSON response in exactly this format, with no additional text or markdown:
+        Based on these conditions, recommend TOP 4 SUITABLE crops. Return ONLY a valid JSON response in exactly this format, with no additional text or markdown:
         {
             "recommendations": [
                 {
-                    "crop": "CropName (తెలుగు అనువాదం)" EXAMPLE: sunflower (పొద్దుతిరుగుడు పువ్వు),
-                    "suitability": "Percentage match"(ENGLISH),
-                    
+                    "crop": "English Name (తెలుగు పేరు)" EXAMPLE: sunflower (పొద్దుతిరుగుడు పువ్వు),,
+                    "suitability": "Percentage match in english"
                 }
             ]
-        }`;
+        }
+
+        IMPORTANT:
+        1. Crop name format MUST be like these examples:
+           - Red Gram (కందిపప్పు)
+           - Sunflower (పొద్దుతిరుగుడు పువ్వు)
+           - Cotton (పత్తి)
+        2. Recommand the top & most accurate suitable crops
+        3. Return exactly 4 recommendations`;
+        
 
         // Make request to Gemini API
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyDQOfndlSBt50Fo-ULVzGufmM_ucLhSgng`, {
