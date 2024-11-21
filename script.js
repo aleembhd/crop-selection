@@ -98,7 +98,7 @@ form.addEventListener('submit', async (e) => {
         
 
         // Make request to Gemini API
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyDQOfndlSBt50Fo-ULVzGufmM_ucLhSgng`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyBwBmRjUaEbb6Mv5yDDDTWoe_5UPjeZ2bc`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
