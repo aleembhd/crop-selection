@@ -28,16 +28,16 @@ body {
 
 .back-button {
     margin-right: 1rem;
-    padding: 0.5rem;
+    padding: 10px 20px;
+    background-color: #f0f0f0;
     border: none;
-    background: none;
+    border-radius: 5px;
     cursor: pointer;
-    border-radius: 9999px;
     transition: background-color 0.2s;
 }
 
 .back-button:hover {
-    background-color: rgb(243, 244, 246);
+    background-color: #e0e0e0;
 }
 
 .title {
