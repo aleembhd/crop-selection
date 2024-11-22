@@ -1,7 +1,6 @@
 window.addEventListener('popstate', function(event) {
     window.location.href = 'https://farmai-97ff8.web.app/';
 });
-
 // State-district mapping (same as in React version)
 const stateDistrictMap = {
     'Andhra Pradesh': ['Anantapur', 'Chittoor', 'East Godavari', 'Guntur', 'Krishna', 'Kurnool', 'Prakasam', 'Srikakulam', 'Visakhapatnam', 'Vizianagaram', 'West Godavari', 'YSR Kadapa'],
@@ -559,5 +558,5 @@ styleSheet.insertRule(`
 
 // Add this function to your script.js
 function goBack() {
-    window.location.href = 'https://farmai-97ff8.web.app/';
+    window.location.replace('https://farmai-97ff8.web.app/');
 }
