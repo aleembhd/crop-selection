@@ -98,11 +98,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 0.5rem;
 }
 
 .spinner {
     animation: spin 1s linear infinite;
-    margin-right: 0.75rem;
 }
 
 @keyframes spin {
@@ -210,4 +210,85 @@ body {
     font-size: 0.875rem;
     color: rgb(55, 65, 81);
     line-height: 1.25;
+}
+
+.area-input-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.area-input-group .form-control {
+    flex: 1;
+}
+
+.area-input-group select {
+    width: 150px;
+}
+
+.organic-alternatives, .precautions {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: rgb(243, 244, 246);
+    border-radius: 0.5rem;
+}
+
+.organic-alternatives h4, .precautions h4 {
+    color: rgb(22, 163, 74);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.organic-option {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.organic-option h5 {
+    color: rgb(22, 163, 74);
+    margin-bottom: 0.5rem;
+}
+
+.precautions ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.precautions li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgb(229, 231, 235);
+}
+
+.precautions li:last-child {
+    border-bottom: none;
+}
+
+.subsidy-info {
+    color: rgb(22, 163, 74);
+    font-weight: 500;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed rgb(167, 243, 208);
+}
+
+.location-status {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background-color: rgb(243, 244, 246);
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.location-status .loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgb(55, 65, 81);
+}
+
+.location-status .spinner {
+    animation: spin 1s linear infinite;
 }
