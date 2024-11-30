@@ -378,7 +378,7 @@ form.addEventListener('submit', async (e) => {
         4. Return exactly 4 recommendations`;
 
         // Make request to Gemini API
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyBwBmRjUaEbb6Mv5yDDDTWoe_5UPjeZ2bc`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyC3aoeIdYGVNLsd5LQWAyUlPxnL0ZMRBww`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
