@@ -13,6 +13,60 @@
     </style>
 </head>
 <body>
+    <div id="locationPopup" class="location-popup-overlay">
+        <div class="location-popup-card">
+            <div class="popup-icon">🌱</div>
+            <h2>Welcome to Crop Assistant</h2>
+            <p>Let us help you find the perfect crops for your farm</p>
+            <button id="continueButton" class="continue-btn">
+                <span>Detect My Location</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="previousCropPopup" class="location-popup-overlay" style="display: none;">
+        <div class="location-popup-card">
+            <div class="popup-icon">🌾</div>
+            <h2>Previous Crop</h2>
+            <p>What crop did you grow in your previous season?</p>
+            <input 
+                type="text" 
+                id="prevCropInput" 
+                class="form-control" 
+                placeholder="e.g., Wheat, Rice, Cotton"
+                required
+            >
+            <button id="cropContinueButton" class="continue-btn">
+                <span>Continue</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="waterSourcePopup" class="location-popup-overlay" style="display: none;">
+        <div class="location-popup-card">
+            <div class="popup-icon">💧</div>
+            <h2>One Last Step!</h2>
+            <p>What is your main source of water?</p>
+            <select 
+                id="waterSourceInput" 
+                class="form-control"
+                required
+            >
+                <option value="">Select water source</option>
+                <option value="well">Well</option>
+                <option value="canal">Canal</option>
+                <option value="rain">Rain Dependent</option>
+                <option value="bore">Bore Well</option>
+            </select>
+            <button id="waterContinueButton" class="continue-btn">
+                <span>Continue</span>
+            </button>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <button onclick="goBack()" class="back-button">← Back</button>
@@ -98,6 +152,8 @@
         </p>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
