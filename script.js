@@ -708,7 +708,7 @@ function storeBestRecommendation(formData, recommendations) {
             return currentSuitability > maxSuitability ? current : max;
         }, recommendations[0]);
 
-        // Create data object with unique key based on timestamp
+        // Create data object
         const dataToStore = {
             timestamp: new Date().toISOString(),
             location: {
@@ -723,15 +723,14 @@ function storeBestRecommendation(formData, recommendations) {
             previousCrop: formData.previousCrop
         };
 
-        // Store in Firebase with error handling
-        return firebase.database().ref('recommendations')
-            .push(dataToStore)
+        // Use set() instead of push() to replace existing data
+        return firebase.database().ref('recommendations/latest').set(dataToStore)
             .then(() => {
-                console.log('Successfully stored recommendation:', bestRecommendation);
+                console.log('Successfully updated best recommendation:', bestRecommendation);
             })
             .catch((error) => {
                 console.error('Firebase write error:', error);
-                throw error; // Re-throw to handle in the calling function
+                throw error;
             });
     } catch (error) {
         console.error('Error processing recommendation:', error);
