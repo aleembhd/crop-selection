@@ -1,3 +1,18 @@
+// Add at the top of script.js
+const firebaseConfig = {
+    apiKey: "AIzaSyCti7EdEc5QcZaqmdecw6S7Jnf1FYVgwJM",
+    authDomain: "farmai-97ff8.firebaseapp.com",
+    databaseURL: "https://farmai-97ff8-default-rtdb.firebaseio.com",
+    projectId: "farmai-97ff8",
+    storageBucket: "farmai-97ff8.firebasestorage.app",
+    messagingSenderId: "746145996011",
+    appId: "1:746145996011:web:0fe94b45568924bfea72ae",
+    measurementId: "G-5D678F88PR"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
 window.addEventListener('popstate', function(event) {
     window.location.href = 'https://farmai-97ff8.web.app/';
 });
@@ -55,6 +70,16 @@ const soilTypeMapping = {
 // Add this at the beginning of the file, after the stateDistrictMap declaration
 const locationStatus = document.getElementById('locationStatus');
 
+// Add near the top after other declarations
+const locationPopup = document.getElementById('locationPopup');
+const continueButton = document.getElementById('continueButton');
+const previousCropPopup = document.getElementById('previousCropPopup');
+const cropContinueButton = document.getElementById('cropContinueButton');
+const prevCropInput = document.getElementById('prevCropInput');
+const waterSourcePopup = document.getElementById('waterSourcePopup');
+const waterContinueButton = document.getElementById('waterContinueButton');
+const waterSourceInput = document.getElementById('waterSourceInput');
+
 // Function to normalize text for comparison
 function normalizeText(text) {
     return text?.toLowerCase()
@@ -77,19 +102,76 @@ function detectCurrentSeason() {
     }
 }
 
+// Add this helper function for better district matching
+function findBestDistrictMatch(apiDistrict, availableDistricts) {
+    console.log('Attempting to match district:', apiDistrict);
+    
+    // Normalize the API district name
+    const normalizedApiDistrict = normalizeDistrict(apiDistrict);
+    
+    let bestMatch = null;
+    let bestScore = 0;
+    
+    availableDistricts.forEach(district => {
+        const normalizedDistrict = normalizeDistrict(district);
+        let score = 0;
+        
+        // Exact match
+        if (normalizedApiDistrict === normalizedDistrict) {
+            score = 100;
+        }
+        // Contained match
+        else if (normalizedDistrict.includes(normalizedApiDistrict) || 
+                 normalizedApiDistrict.includes(normalizedDistrict)) {
+            score = 80;
+        }
+        // Word by word match
+        else {
+            const words1 = normalizedApiDistrict.split(' ');
+            const words2 = normalizedDistrict.split(' ');
+            words1.forEach(w1 => {
+                if (w1.length > 2) { // Ignore very short words
+                    words2.forEach(w2 => {
+                        if (w2.length > 2 && (w1.includes(w2) || w2.includes(w1))) {
+                            score += 30;
+                        }
+                    });
+                }
+            });
+        }
+        
+        if (score > bestScore) {
+            bestScore = score;
+            bestMatch = district;
+        }
+    });
+    
+    console.log('Best match:', bestMatch, 'with score:', bestScore);
+    return bestScore >= 30 ? bestMatch : null;
+}
+
+// Add this helper function for district name normalization
+function normalizeDistrict(district) {
+    return district?.toLowerCase()
+        .replace(/district|mandal|division/g, '')
+        .replace(/[^a-z\s]/g, '')
+        .trim() || '';
+}
+
 // Function to get user's location and reverse geocode it
 async function detectUserLocation() {
+    // Show the loading status
     locationStatus.style.display = 'block';
     
     try {
-        // Get user's current position
+        // Use browser's Geolocation API to get coordinates
         const position = await new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject);
         });
 
         const { latitude, longitude } = position.coords;
         
-        // Use OpenStreetMap Nominatim API for reverse geocoding with more detailed address
+        // Use OpenStreetMap's Nominatim API for reverse geocoding
         const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=en&addressdetails=1&zoom=18`,
             {
@@ -108,95 +190,78 @@ async function detectUserLocation() {
         
         if (data && data.address) {
             let state = data.address.state;
-            // Prioritize state_district field for district detection
+            
+            // Enhanced district detection
             let district = data.address.state_district || 
-                          data.address.county || 
                           data.address.district || 
-                          data.address.city_district || 
-                          data.address.city || 
-                          '';
-            let village = data.address.village || data.address.suburb || data.address.town || '';
+                          data.address.county ||
+                          data.address.city_district ||
+                          data.address.municipality ||
+                          data.address.city;
+                          
+            // Enhanced village detection
+            let village = data.address.village || 
+                         data.address.suburb || 
+                         data.address.neighbourhood ||
+                         data.address.town ||
+                         '';
 
-            console.log('Raw location data:', data.address); // For debugging
+            console.log('Raw location data:', {
+                state: state,
+                district: district,
+                village: village,
+                fullAddress: data.address
+            });
 
-            // Find matching state in our map
             const matchingState = Object.keys(stateDistrictMap).find(s => 
                 normalizeText(s) === normalizeText(state)
             );
 
             if (matchingState) {
-                // Set the state and trigger change event
+                // Set the state
                 stateSelect.value = matchingState;
                 stateSelect.dispatchEvent(new Event('change'));
 
                 // Wait for districts to be populated
                 setTimeout(() => {
-                    // Find and set the district using exact matching first
                     if (district) {
-                        const districtNorm = normalizeText(district);
-                        const exactMatch = Array.from(districtSelect.options)
-                            .find(option => normalizeText(option.text) === districtNorm);
+                        // Use the new matching function
+                        const matchedDistrict = findBestDistrictMatch(
+                            district,
+                            stateDistrictMap[matchingState]
+                        );
 
-                        if (exactMatch) {
-                            districtSelect.value = exactMatch.value;
+                        if (matchedDistrict) {
+                            districtSelect.value = matchedDistrict;
                             districtSelect.dispatchEvent(new Event('change'));
-                            console.log(`District matched exactly: ${exactMatch.text}`);
+                            console.log('District matched:', matchedDistrict);
                         } else {
-                            // If no exact match, try fuzzy matching
-                            let bestMatch = null;
-                            let bestMatchScore = 0;
-
-                            Array.from(districtSelect.options).forEach(option => {
-                                if (option.value) {
-                                    const optionNorm = normalizeText(option.text);
-                                    
-                                    // Calculate match score
-                                    let score = 0;
-                                    if (optionNorm.includes(districtNorm)) score = 75;
-                                    else if (districtNorm.includes(optionNorm)) score = 75;
-                                    else {
-                                        // Check for partial matches
-                                        const words1 = optionNorm.split(' ');
-                                        const words2 = districtNorm.split(' ');
-                                        words1.forEach(w1 => {
-                                            words2.forEach(w2 => {
-                                                if (w1.includes(w2) || w2.includes(w1)) score += 25;
-                                            });
-                                        });
-                                    }
-
-                                    if (score > bestMatchScore) {
-                                        bestMatchScore = score;
-                                        bestMatch = option;
-                                    }
-                                }
-                            });
-
-                            // Set the district if we found a good match
-                            if (bestMatch && bestMatchScore >= 25) {
-                                districtSelect.value = bestMatch.value;
-                                districtSelect.dispatchEvent(new Event('change'));
-                                console.log(`District matched with score: ${bestMatch.text} (score: ${bestMatchScore})`);
-                            }
+                            console.log('No confident district match found');
+                            // Enable district select for manual selection
+                            districtSelect.disabled = false;
                         }
                     }
 
-                    // Set the village name if available
+                    // Set village with better validation
                     const villageInput = form.querySelector('[name="village"]');
                     if (village && villageInput) {
-                        // Capitalize first letter of each word
+                        // Clean and capitalize village name
                         village = village.split(' ')
+                            .filter(word => word.length > 1) // Filter out single letters
                             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                             .join(' ');
-                        villageInput.value = village;
-
-                        // Detect and set soil type
-                        const soilType = detectSoilType(matchingState, district, village);
-                        if (soilType) {
-                            const soilTypeSelect = form.querySelector('[name="soilType"]');
-                            soilTypeSelect.value = soilType;
-                            console.log(`Soil type detected: ${soilType}`);
+                        
+                        if (village.length >= 2) { // Only set if name is meaningful
+                            villageInput.value = village;
                         }
+                    }
+
+                    // Detect and set soil type
+                    const soilType = detectSoilType(matchingState, district, village);
+                    if (soilType) {
+                        const soilTypeSelect = form.querySelector('[name="soilType"]');
+                        soilTypeSelect.value = soilType;
+                        console.log(`Soil type detected: ${soilType}`);
                     }
 
                     // Set the season based on current date
@@ -259,8 +324,77 @@ styleSheet.insertRule(`
     }
 `, styleSheet.cssRules.length);
 
-// Call the location detection function when the page loads
-window.addEventListener('load', detectUserLocation);
+// Modify the window load event
+window.addEventListener('load', () => {
+    locationPopup.style.display = 'flex';
+    
+    // Pre-select red soil
+    const soilTypeSelect = form.querySelector('[name="soilType"]');
+    soilTypeSelect.value = 'red';
+});
+
+// Add this function to handle transitions
+function transitionPopups(currentPopup, nextPopup) {
+    return new Promise((resolve) => {
+        // Start exit animation for current popup
+        currentPopup.querySelector('.location-popup-card').classList.add('popup-exit');
+        
+        // After small delay, prepare next popup
+        setTimeout(() => {
+            // Hide current popup
+            currentPopup.style.display = 'none';
+            
+            // Show next popup but with enter state
+            nextPopup.style.display = 'flex';
+            const nextCard = nextPopup.querySelector('.location-popup-card');
+            nextCard.classList.add('popup-enter');
+            
+            // Force reflow
+            nextCard.offsetHeight;
+            
+            // Start enter animation
+            nextCard.classList.remove('popup-enter');
+            nextCard.classList.add('popup-active');
+            
+            // Cleanup after animation
+            setTimeout(() => {
+                nextCard.classList.remove('popup-active');
+                resolve();
+            }, 600);
+        }, 300);
+    });
+}
+
+// Modify the continue button handlers
+continueButton.addEventListener('click', async () => {
+    detectUserLocation();
+    await transitionPopups(locationPopup, previousCropPopup);
+});
+
+cropContinueButton.addEventListener('click', async () => {
+    const cropValue = prevCropInput.value.trim();
+    if (cropValue) {
+        const previousCropField = form.querySelector('[name="previousCrop"]');
+        previousCropField.value = cropValue;
+        await transitionPopups(previousCropPopup, waterSourcePopup);
+    } else {
+        prevCropInput.focus();
+    }
+});
+
+// Add handler for the third popup's continue button
+waterContinueButton.addEventListener('click', () => {
+    const waterValue = waterSourceInput.value;
+    if (waterValue) {
+        // Fill the form's water availability field
+        const waterField = form.querySelector('[name="waterAvailability"]');
+        waterField.value = waterValue;
+        // Close the popup
+        waterSourcePopup.style.display = 'none';
+    } else {
+        waterSourceInput.focus();
+    }
+});
 
 // Initialize form elements
 const form = document.getElementById('cropForm');
@@ -451,6 +585,9 @@ form.addEventListener('submit', async (e) => {
                 </div>
             `;
             recommendationsDiv.style.display = 'block';
+            
+            // Add this line to store the best recommendation
+            storeBestRecommendation(formData, aiResponse.recommendations);
         } else {
             throw new Error('No recommendations received');
         }
@@ -559,4 +696,45 @@ styleSheet.insertRule(`
 // Add this function to your script.js
 function goBack() {
     window.location.replace('https://farmai-97ff8.web.app/');
+}
+
+// Add this function to store the best recommendation
+function storeBestRecommendation(formData, recommendations) {
+    try {
+        // Find recommendation with highest suitability
+        const bestRecommendation = recommendations.reduce((max, current) => {
+            const currentSuitability = parseInt(current.suitability.replace('%', ''));
+            const maxSuitability = parseInt(max.suitability.replace('%', ''));
+            return currentSuitability > maxSuitability ? current : max;
+        }, recommendations[0]);
+
+        // Create data object with unique key based on timestamp
+        const dataToStore = {
+            timestamp: new Date().toISOString(),
+            location: {
+                state: formData.state,
+                district: formData.district,
+                village: formData.village
+            },
+            bestCrop: bestRecommendation,
+            soilType: formData.soilType,
+            season: formData.season,
+            waterAvailability: formData.waterAvailability,
+            previousCrop: formData.previousCrop
+        };
+
+        // Store in Firebase with error handling
+        return firebase.database().ref('recommendations')
+            .push(dataToStore)
+            .then(() => {
+                console.log('Successfully stored recommendation:', bestRecommendation);
+            })
+            .catch((error) => {
+                console.error('Firebase write error:', error);
+                throw error; // Re-throw to handle in the calling function
+            });
+    } catch (error) {
+        console.error('Error processing recommendation:', error);
+        throw error;
+    }
 }
