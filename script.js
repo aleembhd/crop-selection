@@ -1,14 +1,14 @@
 // Add at the top of script.js
 const firebaseConfig = {
-    apiKey: "AIzaSyCti7EdEc5QcZaqmdecw6S7Jnf1FYVgwJM",
-    authDomain: "farmai-97ff8.firebaseapp.com",
-    databaseURL: "https://farmai-97ff8-default-rtdb.firebaseio.com",
-    projectId: "farmai-97ff8",
-    storageBucket: "farmai-97ff8.firebasestorage.app",
-    messagingSenderId: "746145996011",
-    appId: "1:746145996011:web:0fe94b45568924bfea72ae",
-    measurementId: "G-5D678F88PR"
-};
+    apiKey: "AIzaSyDLMCZI_p32QbqvPD2V2KvKJXTtnYJ6mTc",
+    authDomain: "cropselection-316d5.firebaseapp.com",
+    projectId: "cropselection-316d5",
+    storageBucket: "cropselection-316d5.firebasestorage.app",
+    messagingSenderId: "1093087500946",
+    appId: "1:1093087500946:web:af664727fc6d0e936de44b",
+    measurementId: "G-FRXY8MPDYS"
+  };
+  
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
